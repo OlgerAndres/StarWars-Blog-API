@@ -1,4 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy,ForeignKey
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
@@ -24,10 +24,10 @@ class Planets(db.Model):
     gravity = db.Column(db.Integer)
     diameter = db.Column(db.Integer)
 
-class Favorites(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    characters_id =Column(Integer,ForeignKey('characters.id'))
-    planets_id = Column(Integer,ForeignKey('planets.id'))
+# class Favorites(db.Model):
+#     id = db.Column(db.Integer,primary_key=True)
+#     characters_id =Column(Integer,ForeignKey('characters.id'))
+#     planets_id = Column(Integer,ForeignKey('planets.id'))
         
 
 

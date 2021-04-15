@@ -39,7 +39,10 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
-
+@app.route('/characters',methods=['GET'])
+def get_characters():
+    response = {'message': 'success'}
+    return jsonify(response)
 
 
 # this only runs if `$ python src/main.py` is executed

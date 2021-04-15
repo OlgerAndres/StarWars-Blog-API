@@ -1,4 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy,ForeignKey
 
 db = SQLAlchemy()
 
@@ -7,6 +7,28 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+
+class Characters(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(120))
+    gender = db.Column(db.String(120))
+    hair_color =  db.Column(db.String(70))
+    eye_color =  db.Column(db.String(70))
+    heigth =  db.Column(db.Integer)
+
+class Planets(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(120))
+    terrain = db.Column(db.Integer)
+    population = db.Column(db.Integer)
+    gravity = db.Column(db.Integer)
+    diameter = db.Column(db.Integer)
+
+class Favorites(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    characters_id =Column(Integer,ForeignKey('characters.id'))
+    planets_id = Column(Integer,ForeignKey('planets.id'))
+        
 
 
 
@@ -20,10 +42,3 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
 
-class Characters(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    name = db.Column(db.String(120),unique=True,nullable=False)
-    gender = db.Column(db.String(120),unique=True,nullable=False)
-    hair_color =  db.Column(db.String(70),unique=True,nullable=False)
-    eye_color =  db.Column(db.String(70),unique=True,nullable=False)
-    heigth =  db.Column(db.Integer,unique=True,nullable=False)

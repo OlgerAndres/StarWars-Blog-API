@@ -10,7 +10,9 @@ from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User,Characters,Planets,Favorites
 
-# from flask_jwt_extended import create_access_token , get_jwt_identity , jwt_required , JWTManager
+from flask_jwt_extended import create_access_token , get_jwt_identity , jwt_required , JWTManager
+#Debo escribir en consola el comando  pipenv install flask-jwt-extended
+import  datetime
 
 
 app = Flask(__name__)
@@ -23,8 +25,8 @@ CORS(app)
 setup_admin(app)
 
 
-# app.config["JWT_SECRET_KEY"] = "JWT_SECRET_KEY"
-# jwt = JWTManager(app)
+app.config["JWT_SECRET_KEY"] = "JWT_SECRET_KEY"
+jwt = JWTManager(app)
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -36,6 +38,7 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+#Endpoints de users-------------------------------------------
 @app.route('/test_user', methods=['GET'])
 def handle_hello():
 
@@ -49,34 +52,38 @@ def handle_hello():
 @app.route('/user', methods=['GET'])
 def get_user():
      users = User.query.all()
-     request = list(map(lambda user:user.serialize(),users))
+     request = list(map(lambda user:user.serialize_user(),users))
      return jsonify(request),200  
 
-@app.route('/register',methods=['POST'])
-def create_register():
-    username = request.json.get("username",None)
-    email = request.json.get("email",None)
-    password = request.json.get('password',None)
-    if username is None:
-        return jsonify({"msg": "No username was provided"}),400
-    if email is None:
-        return jsonify({"msg": "No email was provided"}),400
-    if password is None:
-        return jsonify({"msg" : "No email was provided"}),400
-    user = User.query.filter_by(email=email,password=password).first()
-    if user:
-        return  jsonify({"msg" : "User already exists"}),401
-    else:
-        new_user = User()
-        new_user.username = username
-        new_user.email = email
-        new_user.password = password
+@app.route('/login',methods=['POST'])
+def login():
+    if request.method == "POST":
+        username =  request.json["username"]
+        password = request.json["password"]
 
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({"msg": "User created succesfully"}),200   
+        if not username:
+            return jsonify({"Error":"usarname Invalid"}), 400
+        if not password:
+            return jsonify({"Error":"Password Invalid"}),400
+        
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            return jsonify({"Error":"User not found"}),400
+        #Create Tokken
+        expiration_date = datetime.timedelta(days=1)
+        access_token = create_access_token(identity=username,expires_delta=expiration_date)
+
+        request_body = {
+            "user":user.serialize(),
+            "token":access_token
+        }
+
+        return jsonify(request_body),200
+        
+     
     
-
+#----------------------------------------------------------Endpoints de users
 
 @app.route('/characters/',methods=['GET'])
 def get_characters():

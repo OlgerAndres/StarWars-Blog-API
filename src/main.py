@@ -8,9 +8,10 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User,Characters,Planets
-#from models import Person
-#from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from models import db, User,Characters,Planets,Favorites
+
+# from flask_jwt_extended import create_access_token , get_jwt_identity , jwt_required , JWTManager
+
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -22,7 +23,7 @@ CORS(app)
 setup_admin(app)
 
 
-# app.config["JWT_SECRET_KEY"] = "super-secrect"
+# app.config["JWT_SECRET_KEY"] = "JWT_SECRET_KEY"
 # jwt = JWTManager(app)
 
 # Handle/serialize errors like a JSON object
@@ -35,7 +36,7 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/user', methods=['GET'])
+@app.route('/test_user', methods=['GET'])
 def handle_hello():
 
     response_body = {
@@ -44,11 +45,20 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+
+@app.route('/user', methods=['GET'])
+def get_user():
+     users = User.query.all()
+     request = list(map(lambda user:user.serialize(),users))
+     return jsonify(request),200  
+
 @app.route('/register',methods=['POST'])
 def create_register():
+    username = request.json.get("username",None)
     email = request.json.get("email",None)
     password = request.json.get('password',None)
-
+    if username is None:
+        return jsonify({"msg": "No username was provided"}),400
     if email is None:
         return jsonify({"msg": "No email was provided"}),400
     if password is None:
@@ -58,6 +68,7 @@ def create_register():
         return  jsonify({"msg" : "User already exists"}),401
     else:
         new_user = User()
+        new_user.username = username
         new_user.email = email
         new_user.password = password
 

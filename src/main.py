@@ -38,7 +38,7 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-#Endpoints de users-------------------------------------------
+#Endpoints de users------------------------------------------------------------Endpoints of users
 @app.route('/test_user', methods=['GET'])
 def handle_hello():
 
@@ -80,19 +80,100 @@ def login():
 
         return jsonify(request_body),200
         
-     
+@app.route('/register', methods=['POST'])
+def register_user():
+    username = request.json.get("username",None)
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    if username is None:
+        return jsonify({"msg":"No username was provided"}),400
+    if email is None:
+        return jsonify({"msg": "No email was provided"}), 400
+    if password is None:
+        return jsonify({"msg": "No password was provided"}), 400
     
-#----------------------------------------------------------Endpoints de users
+    user = User.query.filter_by(username=username,email=email, password=password).first()
+    if user:
+        # the user was not found on the database
+        return jsonify({"msg": "User already exists"}), 401
+    else:
+        new_user = User()
+        new_user.username = username
+        new_user.email = email
+        new_user.password = password
+
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"msg": "User created successfully"}), 200
+
+
+@app.route('/users/<int:id>', methods=['GET'])
+def  user_id(id):
+     user = User.query.filter_by(id=id).first()
+     if user is None:
+        raise APIException("msg: User not found",status_code=404)
+     request = user.serialize()
+     return jsonify(request),200
+
+@app.route('/users/<int:id>', methods=['DELETE'])
+@jwt_required()
+def  delete_user(id):
+    current_user = get_jwt_identity()
+    user1 = User.query.get(id)
+    if user1 is None:
+        raise APIException("User is not found",status_code=404)
+    db.session.delete(user1)
+    db.session.commit()
+    return jsonify({"Succesfully":current_user}),200
+
+@app.route('/users/<int:id>', methods=['UPDATE'])
+#@jwt_required()
+def update_user(id):
+    user1 = Person.query.get(person_id)
+    if user1 is None:
+        raise APIException('User not found', status_code=404)
+    if "username" in body:
+        user1.username = body["username"]
+    if "email" in body:
+        user1.email = body["email"]
+        db.session.commit()
+    
+    
+#Endpoints of users---------------------------------------------------------------Endpoints of users
+
+
+#Endpoints of characters----------------------------------------------------------Endpoints of characters
 
 @app.route('/characters', methods=['GET'])
 def get_characters():
     data = jsonify(Characters.get_characters())
     return data
 
+
+@app.route('/character/<int:id>', methods=['GET'])
+def  characters_id(id):
+     character = Characters.query.filter_by(id=id).first()
+     if character is None:
+        raise APIException("msg: character not found",status_code=404)
+     request = character.serialize()
+     return jsonify(request),200
+
+#Endpoints of characters----------------------------------------------------------Endpoints of characters
+
+#Endpoints of planets----------------------------------------------------------Endpoints of planets
 @app.route('/planets', methods=['GET'])
 def get_planets():
     data = jsonify(Planets.get_planets())
     return data
+
+@app.route('/planet/<int:id>', methods=['GET'])
+def planets_id(id):
+     planet = Planets.query.filter_by(id=id).first()
+     if planet is None:
+        raise APIException("msg: planet not found",status_code=404)
+     request = planet.serialize()
+     return jsonify(request),200
+#Endpoints of planets----------------------------------------------------------Endpoints of planets
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

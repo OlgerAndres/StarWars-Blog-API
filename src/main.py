@@ -50,10 +50,9 @@ def handle_hello():
 
 
 @app.route('/user', methods=['GET'])
-def get_user():
-     users = User.query.all()
-     request = list(map(lambda user:user.serialize_user(),users))
-     return jsonify(request),200  
+def get_users():
+    data = jsonify(User.get_users())
+    return data
 
 @app.route('/login',methods=['POST'])
 def login():
@@ -85,19 +84,15 @@ def login():
     
 #----------------------------------------------------------Endpoints de users
 
-@app.route('/characters/',methods=['GET'])
+@app.route('/characters', methods=['GET'])
 def get_characters():
-    response_body = {
-        "msg": "Hello, this is your GET /characters response "
-    }
-    return jsonify(response_body), 200
+    data = jsonify(Characters.get_characters())
+    return data
 
-@app.route('/planets/',methods=['GET'])
+@app.route('/planets', methods=['GET'])
 def get_planets():
-  response_body = {
-        "msg": "Hello, this is your GET /planets response "
-    }
-  return jsonify(response_body), 200
+    data = jsonify(Planets.get_planets())
+    return data
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

@@ -12,13 +12,17 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-    def serialize_user(self):
+    def serialize(self):
         return {
             "id": self.id,
             "email": self.email,
             "username":self.username,
             # do not serialize the password, its a security breach
         }
+    def get_users():
+        all_users = User.query.all()
+        all_users = list(map(lambda x: x.serialize(),all_users))
+        return all_users
 
 class Characters(db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -31,7 +35,7 @@ class Characters(db.Model):
     def __repr__(self):
         return '<Characters %r>' % self.id
 
-    def serialize_characters(self):
+    def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
@@ -40,6 +44,11 @@ class Characters(db.Model):
             "eye_color":self.eye_color,
             "heigth":self.heigth,
         }
+    def get_characters():
+        all_characters = Characters.query.all()
+        all_characters = list(map(lambda x: x.serialize(),all_characters))
+        return all_characters
+
 
 class Planets(db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -52,15 +61,20 @@ class Planets(db.Model):
     def __repr__(self):
         return '<Planets %r>' % self.id
 
-    def serialize_planets(self):
+    def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
             "terrain":self.terrain,
             "population":self.population,
-            "gravity":self.grativy,
+            "gravity":self.gravity,
             "diameter":self.diameter,
         }
+
+    def get_planets():
+        all_planets = Planets.query.all()
+        all_planets = list(map(lambda x: x.serialize(),all_planets))
+        return all_planets
 
 class Favorites(db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -70,12 +84,17 @@ class Favorites(db.Model):
     def __repr__(self):
         return '<Favorites %r>' % self.id
 
-    def serialize_favorites(self):
+    def serialize(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
             "fav_name":self.fav_name,
         }
+
+    def get_favoritos():
+        all_favorites = Favorites.query.all()
+        all_favorites = list(map(lambda x: x.serialize(),all_favorites))
+        return all_favorites
    
         
 

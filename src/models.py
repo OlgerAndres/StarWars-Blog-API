@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import  Column ,ForeignKey,Integer,String   
 
 db = SQLAlchemy()
 
@@ -77,24 +78,21 @@ class Planets(db.Model):
         return all_planets
 
 class Favorites(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    fav_name =  db.Column(db.String(250),nullable = False)
-
-    def __repr__(self):
-        return '<Favorites %r>' % self.id
+    id = db.Column(Integer, primary_key=True)
+    user_id = db.Column(Integer, ForeignKey(User.id))
+    planet_id = db.Column(Integer, ForeignKey(Planets.id))
+    character_id = db.Column(Integer, ForeignKey(Characters.id))
+    planets = db.relationship("Planets")
+    user = db.relationship("User")
+    characters = db.relationship("Characters")
 
     def serialize(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "fav_name":self.fav_name,
+            "planet_id": self.planet_id,
+            "character_id": self.character_id,
         }
 
-    def get_favoritos():
-        all_favorites = Favorites.query.all()
-        all_favorites = list(map(lambda x: x.serialize(),all_favorites))
-        return all_favorites
-   
         
 

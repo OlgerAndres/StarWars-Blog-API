@@ -126,10 +126,10 @@ def  delete_user(id):
     db.session.commit()
     return jsonify({"Succesfully":current_user}),200
 
-@app.route('/users/<int:id>', methods=['UPDATE'])
+@app.route('/users/<int:id>', methods=['PUT'])
 #@jwt_required()
 def update_user(id):
-    user1 = Person.query.get(person_id)
+    user1 = User.query.get(id)
     if user1 is None:
         raise APIException('User not found', status_code=404)
     if "username" in body:
@@ -137,7 +137,8 @@ def update_user(id):
     if "email" in body:
         user1.email = body["email"]
         db.session.commit()
-    
+        body = request.get()
+    return jsonify({"Succesfully":user1}),200
     
 #Endpoints of users---------------------------------------------------------------Endpoints of users
 
@@ -175,6 +176,14 @@ def planets_id(id):
      return jsonify(request),200
 #Endpoints of planets----------------------------------------------------------Endpoints of planets
 
+@app.route('/users/<int:id>/favorites', methods=['GET'])
+def favorites_id(id):   
+     favorite = Favorites.query.filter_by(id=id).first()
+     if favorite is None:
+        raise APIException("msg: favorite not found",status_code=404)
+     request = favorite.serialize()
+     return jsonify(request),200
+#Endpoints of favorites--------------------------------------------------------Endpoints of favorites
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))

@@ -126,18 +126,19 @@ def  delete_user(id):
     db.session.commit()
     return jsonify({"Succesfully":current_user}),200
 
-@app.route('/users/<int:id>', methods=['PUT'])
-# @jwt_required()
+@app.route('/users/<int:id>', methods = ['PUT'])
 def update_user(id):
     user1 = User.query.get(id)
-    if user1 is None:
-        raise APIException('User not found', status_code=404)
-    if "username" in body:
-        user1.username = body["username"]
-    if "email" in body:
-        user1.email = body["email"]
-        db.session.update(user1)
-        db.session.commit()
+    username = request.json['username']
+    email = request.json['email']
+
+    user1.username = username
+    user1.email = email
+    db.session.commit()
+   
+    return jsonify(user1.serialize()), 200
+   
+
 #Endpoints of users---------------------------------------------------------------Endpoints of users
 
 

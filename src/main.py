@@ -127,7 +127,7 @@ def  delete_user(id):
     return jsonify({"Succesfully":current_user}),200
 
 @app.route('/users/<int:id>', methods=['PUT'])
-#@jwt_required()
+# @jwt_required()
 def update_user(id):
     user1 = User.query.get(id)
     if user1 is None:
@@ -136,10 +136,8 @@ def update_user(id):
         user1.username = body["username"]
     if "email" in body:
         user1.email = body["email"]
+        db.session.update(user1)
         db.session.commit()
-        body = request.get()
-    return jsonify({"Succesfully":user1}),200
-    
 #Endpoints of users---------------------------------------------------------------Endpoints of users
 
 
@@ -176,13 +174,13 @@ def planets_id(id):
      return jsonify(request),200
 #Endpoints of planets----------------------------------------------------------Endpoints of planets
 
-@app.route('/users/<int:id>/favorites', methods=['GET'])
-def favorites_id(id):   
-     favorite = Favorites.query.filter_by(id=id).first()
-     if favorite is None:
-        raise APIException("msg: favorite not found",status_code=404)
-     request = favorite.serialize()
-     return jsonify(request),200
+@app.route('/favorites', methods=['GET'])
+@jwt_required()
+def get_favorites():   
+     current_user_id = get_jwt_identity()
+     all_favorites = Favorites.query.filter_by(user_id = current_user_id)
+     all_favorites = list(map(lambda x: x.serialize(),all_favorites))
+     return jsonify(all_favorites),200
 #Endpoints of favorites--------------------------------------------------------Endpoints of favorites
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

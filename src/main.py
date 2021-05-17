@@ -182,6 +182,18 @@ def get_favorites():
      all_favorites = Favorites.query.filter_by(user_id = current_user_id)
      all_favorites = list(map(lambda x: x.serialize(),all_favorites))
      return jsonify(all_favorites),200
+
+
+@app.route('/favorites/<int:id>', methods=['DELETE'])
+@jwt_required()
+def  delete_favorites(id):
+    current_user = get_jwt_identity()
+    favorite1 = Favorites.query.get(id)
+    if favorite1 is None:
+        raise APIException("Favorite is not found",status_code=404)
+    db.session.delete(favorite1)
+    db.session.commit()
+    return jsonify({"Succesfully":current_user}),200
 #Endpoints of favorites--------------------------------------------------------Endpoints of favorites
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
